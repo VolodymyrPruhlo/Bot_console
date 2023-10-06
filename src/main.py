@@ -6,7 +6,7 @@ def parsing_command(command):
     pattern_for_phone = r"\+38\d{10}|0\d{9}|38\d{10}"
 
     if not command:
-        raise ValueError("Command is empty")
+        return False
 
     parts = command.split()
 
@@ -14,13 +14,13 @@ def parsing_command(command):
         if re.match(pattern_for_name, parts[1]) and re.match(pattern_for_phone, parts[2]):
             return True
         else:
-            raise ValueError("Name or phone number incorrect")
+            return False
 
     if parts[0] == 'phone' and len(parts) == 2:
         if re.match(pattern_for_name, parts[1]):
             return True
         else:
-            raise ValueError("Name incorrect, try again")
+            return False
 
     if parts[0] == 'show' and len(parts) == 2 and parts[1] == 'all':
         return True
@@ -28,7 +28,7 @@ def parsing_command(command):
     if command in ['hello', 'close']:
         return True
 
-    raise ValueError("Command not recognized")
+    return "Command not recognized"
 
 
 def hello_func():
@@ -98,19 +98,19 @@ def input_error(func):
 def handler(contacts):
     def inner(command):
 
-        if command.startswith('hello'):
+        if parsing_command(command) and command.startswith('hello'):
             hello_function = hello_func()
             return hello_function
-        elif command.startswith('add'):
+        elif parsing_command(command) and command.startswith('add'):
             add_func = add_contacts(contacts)
             return add_func(command)
-        elif command.startswith('change'):
+        elif parsing_command(command) and command.startswith('change'):
             change_func = change_contact(contacts)
             return change_func(command)
-        elif command.startswith('phone'):
+        elif parsing_command(command) and command.startswith('phone'):
             phone_func = phone_contact(contacts)
             return phone_func(command)
-        elif command.startswith('show all'):
+        elif parsing_command(command) and command.startswith('show all'):
             show_all_function = show_all_func(contacts)
             return show_all_function
 
