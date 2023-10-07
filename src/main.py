@@ -1,36 +1,6 @@
 import re
 
 
-def parsing_command(command):
-    pattern_for_name = r"^[a-zA-Zа-яА-ЯІіЇї\s'\".,-]{2,}$"
-    pattern_for_phone = r"\+38\d{10}|0\d{9}|38\d{10}"
-
-    if not command:
-        return False
-
-    parts = command.split()
-
-    if parts[0] in ['change', 'add'] and len(parts) == 3:
-        if re.match(pattern_for_name, parts[1]) and re.match(pattern_for_phone, parts[2]):
-            return True
-        else:
-            return False
-
-    if parts[0] == 'phone' and len(parts) == 2:
-        if re.match(pattern_for_name, parts[1]):
-            return True
-        else:
-            return False
-
-    if parts[0] == 'show' and len(parts) == 2 and parts[1] == 'all':
-        return True
-
-    if command in ['hello', 'close']:
-        return True
-
-    return "Command not recognized"
-
-
 def hello_func():
     return 'Hello how can i help you?'
 
@@ -98,19 +68,42 @@ def input_error(func):
 def handler(contacts):
     def inner(command):
 
-        if parsing_command(command) and command.startswith('hello'):
+        parts = command.split()
+        pattern_for_name = r"^[a-zA-Zа-яА-ЯІіЇї\s'\".,-]{2,}$"
+        pattern_for_phone = r"\+38\d{10}|0\d{9}|38\d{10}"
+
+        if command == 'hello':
             hello_function = hello_func()
             return hello_function
-        elif parsing_command(command) and command.startswith('add'):
-            add_func = add_contacts(contacts)
-            return add_func(command)
-        elif parsing_command(command) and command.startswith('change'):
-            change_func = change_contact(contacts)
-            return change_func(command)
-        elif parsing_command(command) and command.startswith('phone'):
-            phone_func = phone_contact(contacts)
-            return phone_func(command)
-        elif parsing_command(command) and command.startswith('show all'):
+
+        elif parts[0] == 'add':
+            if len(command.split()) != 3:
+                return "Invalid format. Please use 'add NAME PHONE' format."
+            else:
+                if re.match(pattern_for_name, parts[1]) and re.match(pattern_for_phone, parts[2]):
+                    add_func = add_contacts(contacts)
+                    return add_func(command)
+                return 'invalid Name or Phone, please check again'
+
+        elif parts[0] == 'change':
+            if len(command.split()) != 3:
+                return "Invalid format. Please use 'change NAME PHONE' format."
+            else:
+                if re.match(pattern_for_name, parts[1]) and re.match(pattern_for_phone, parts[2]):
+                    change_func = change_contact(contacts)
+                    return change_func(command)
+                return 'invalid Name or Phone, please check again'
+
+        elif parts[0] == 'phone':
+            if len(command.split()) != 2:
+                return "Invalid format. Please use 'phone NAME' format."
+            else:
+                if re.match(pattern_for_name, parts[1]):
+                    phone_func = phone_contact(contacts)
+                    return phone_func(command)
+                return 'invalid Name, please check again'
+
+        elif parts[0] == 'show' and len(parts) == 2 and parts[1] == 'all':
             show_all_function = show_all_func(contacts)
             return show_all_function
 
@@ -130,25 +123,6 @@ def main():
         if command == 'close':
             print('Good bye')
             break
-
-        if command.startswith('add'):
-            if len(command.split()) != 3:
-                print("Invalid format. Please use 'add NAME PHONE' format.")
-            else:
-                response = handler(contacts)
-                print(response(command))
-        elif command.startswith('change'):
-            if len(command.split()) != 3:
-                print("Invalid format. Please use 'change NAME PHONE' format.")
-            else:
-                response = handler(contacts)
-                print(response(command))
-        elif command.startswith('phone'):
-            if len(command.split()) != 2:
-                print("Invalid format. Please use 'phone NAME' format.")
-            else:
-                response = handler(contacts)
-                print(response(command))
         else:
             response = handler(contacts)
             print(response(command))
