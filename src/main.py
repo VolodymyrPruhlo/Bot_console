@@ -112,7 +112,7 @@ def handler(contacts):
     return inner
 
 
-@input_error
+
 def main():
     contacts = {}
     print('Welcome to assist bot')
